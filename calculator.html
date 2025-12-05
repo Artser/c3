@@ -11,28 +11,103 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --bg-start: #667eea;
+            --bg-end: #764ba2;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --display-bg: #1a1a1a;
+            --display-text: #ffffff;
+            --button-bg: #f0f0f0;
+            --button-text: #333333;
+            --button-hover: #e0e0e0;
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            --operator-bg: #667eea;
+            --operator-hover: #5568d3;
+            --equals-bg: #764ba2;
+            --equals-hover: #653a8a;
+            --clear-bg: #ff6b6b;
+            --clear-hover: #ee5a5a;
+            --toggle-bg: rgba(255, 255, 255, 0.2);
+            --toggle-text: #ffffff;
+            --toggle-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .dark-theme {
+            --bg-start: #0f172a;
+            --bg-end: #1f2937;
+            --card-bg: #111827;
+            --text-primary: #e5e7eb;
+            --display-bg: #0b1222;
+            --display-text: #e5e7eb;
+            --button-bg: #1f2937;
+            --button-text: #e5e7eb;
+            --button-hover: #2d3748;
+            --shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            --operator-bg: #7c3aed;
+            --operator-hover: #6d28d9;
+            --equals-bg: #a855f7;
+            --equals-hover: #9333ea;
+            --clear-bg: #ef4444;
+            --clear-hover: #dc2626;
+            --toggle-bg: rgba(255, 255, 255, 0.1);
+            --toggle-text: #e5e7eb;
+            --toggle-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
             padding: 20px;
+            color: var(--text-primary);
+            transition: background 0.3s ease;
         }
 
         .calculator {
-            background: #ffffff;
+            background: var(--card-bg);
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow);
             padding: 30px;
-            max-width: 400px;
+            max-width: 420px;
             width: 100%;
+            transition: background 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .theme-toggle {
+            border: none;
+            background: var(--toggle-bg);
+            color: var(--toggle-text);
+            padding: 10px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: var(--toggle-shadow);
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+        }
+
+        .theme-toggle:active {
+            transform: translateY(0);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
         .display {
-            background: #1a1a1a;
-            color: #ffffff;
+            background: var(--display-bg);
+            color: var(--display-text);
             font-size: 2.5rem;
             padding: 20px;
             text-align: right;
@@ -44,6 +119,7 @@
             justify-content: flex-end;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .buttons {
@@ -53,7 +129,7 @@
         }
 
         button {
-            background: #f0f0f0;
+            background: var(--button-bg);
             border: none;
             border-radius: 10px;
             font-size: 1.5rem;
@@ -61,11 +137,11 @@
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 600;
-            color: #333;
+            color: var(--button-text);
         }
 
         button:hover {
-            background: #e0e0e0;
+            background: var(--button-hover);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
@@ -76,30 +152,30 @@
         }
 
         .operator {
-            background: #667eea;
+            background: var(--operator-bg);
             color: #ffffff;
         }
 
         .operator:hover {
-            background: #5568d3;
+            background: var(--operator-hover);
         }
 
         .equals {
-            background: #764ba2;
+            background: var(--equals-bg);
             color: #ffffff;
         }
 
         .equals:hover {
-            background: #653a8a;
+            background: var(--equals-hover);
         }
 
         .clear {
-            background: #ff6b6b;
+            background: var(--clear-bg);
             color: #ffffff;
         }
 
         .clear:hover {
-            background: #ee5a5a;
+            background: var(--clear-hover);
         }
 
         .zero {
@@ -109,6 +185,9 @@
 </head>
 <body>
     <div class="calculator">
+        <div class="top-bar">
+            <button id="themeToggle" class="theme-toggle" aria-label="Переключить тему">Темная тема</button>
+        </div>
         <div class="display" id="display">0</div>
         <div class="buttons">
             <button class="clear" onclick="clearDisplay()">C</button>
@@ -138,12 +217,42 @@
 
     <script>
         let display = document.getElementById('display');
+        let themeToggle = document.getElementById('themeToggle');
         let currentInput = '0';
         let shouldResetDisplay = false;
+        const THEME_KEY = 'calculator-theme';
 
         function updateDisplay() {
             display.textContent = currentInput;
         }
+
+        function updateThemeLabel(theme) {
+            themeToggle.textContent = theme === 'dark' ? 'Светлая тема' : 'Темная тема';
+            themeToggle.setAttribute('aria-pressed', theme === 'dark');
+        }
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+            }
+            updateThemeLabel(theme);
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem(THEME_KEY);
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+            applyTheme(initialTheme);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.body.classList.contains('dark-theme');
+            const nextTheme = isDark ? 'light' : 'dark';
+            applyTheme(nextTheme);
+            localStorage.setItem(THEME_KEY, nextTheme);
+        });
 
         function appendNumber(number) {
             if (shouldResetDisplay) {
@@ -159,13 +268,25 @@
             updateDisplay();
         }
 
+        function getLastNumber() {
+            let lastOperatorIndex = -1;
+            for (let i = currentInput.length - 1; i >= 0; i--) {
+                if (['+', '-', '*', '/'].includes(currentInput[i])) {
+                    lastOperatorIndex = i;
+                    break;
+                }
+            }
+            return currentInput.slice(lastOperatorIndex + 1);
+        }
+
         function appendDecimal() {
             if (shouldResetDisplay) {
                 currentInput = '0';
                 shouldResetDisplay = false;
             }
             
-            if (!currentInput.includes('.')) {
+            const lastNumber = getLastNumber();
+            if (!lastNumber.includes('.')) {
                 currentInput += '.';
                 updateDisplay();
             }
@@ -187,7 +308,6 @@
 
         function calculate() {
             try {
-                // Заменяем × на * для вычисления
                 let expression = currentInput.replace(/×/g, '*');
                 
                 // Проверяем на деление на ноль
@@ -261,6 +381,8 @@
                 deleteLast();
             }
         });
+
+        initTheme();
     </script>
 </body>
 </html>
