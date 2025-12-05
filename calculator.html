@@ -181,6 +181,72 @@
         .zero {
             grid-column: span 2;
         }
+
+        .history {
+            margin-top: 24px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .history-list {
+            max-height: 180px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-item {
+            background: var(--button-bg);
+            color: var(--text-primary);
+            border-radius: 10px;
+            padding: 10px 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .history-expression {
+            opacity: 0.8;
+        }
+
+        .history-result {
+            font-weight: 700;
+        }
+
+        .history-empty {
+            color: var(--text-primary);
+            opacity: 0.7;
+        }
+
+        .history-clear {
+            border: none;
+            background: var(--clear-bg);
+            color: #ffffff;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .history-clear:hover {
+            background: var(--clear-hover);
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
@@ -215,12 +281,24 @@
         </div>
     </div>
 
+    <div class="history" aria-live="polite">
+        <div class="history-header">
+            <span>Журнал операций</span>
+            <button class="history-clear" onclick="clearHistory()">Очистить</button>
+        </div>
+        <div id="historyList" class="history-list">
+            <div class="history-empty">Пока нет операций</div>
+        </div>
+    </div>
+
     <script>
         let display = document.getElementById('display');
         let themeToggle = document.getElementById('themeToggle');
+        let historyList = document.getElementById('historyList');
         let currentInput = '0';
         let shouldResetDisplay = false;
         const THEME_KEY = 'calculator-theme';
+        const HISTORY_MAX = 15;
 
         function updateDisplay() {
             display.textContent = currentInput;
@@ -323,6 +401,7 @@
                 if (isNaN(result) || !isFinite(result)) {
                     currentInput = 'Ошибка';
                 } else {
+                    addToHistory(currentInput, result.toString());
                     currentInput = result.toString();
                 }
                 
@@ -333,6 +412,40 @@
                 updateDisplay();
                 shouldResetDisplay = true;
             }
+        }
+
+        function addToHistory(expression, result) {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+
+            const exprEl = document.createElement('span');
+            exprEl.className = 'history-expression';
+            exprEl.textContent = expression + ' =';
+
+            const resEl = document.createElement('span');
+            resEl.className = 'history-result';
+            resEl.textContent = result;
+
+            item.appendChild(exprEl);
+            item.appendChild(resEl);
+
+            if (historyList.firstElementChild && historyList.firstElementChild.classList.contains('history-empty')) {
+                historyList.firstElementChild.remove();
+            }
+
+            historyList.prepend(item);
+
+            while (historyList.children.length > HISTORY_MAX) {
+                historyList.removeChild(historyList.lastElementChild);
+            }
+        }
+
+        function clearHistory() {
+            historyList.innerHTML = '';
+            const emptyState = document.createElement('div');
+            emptyState.className = 'history-empty';
+            emptyState.textContent = 'Пока нет операций';
+            historyList.appendChild(emptyState);
         }
 
         function clearDisplay() {
